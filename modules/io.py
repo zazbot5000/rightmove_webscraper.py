@@ -14,11 +14,11 @@ def get_and_save():
     df.search_date = df.search_date.dt.date
 
     df.search_date = pd.to_datetime(df.search_date)
-    df.to_parquet('data/bris_df.parquet', compression=None)
+    df.to_parquet("data/bris_df.parquet", compression=None)
     print("\nweb data scraped!")
 
 
 def load():
     print("loading data...")
-    df = pd.read_parquet('data/bris_df.parquet')
+    df = pd.read_parquet("data/bris_df.parquet")
     return df

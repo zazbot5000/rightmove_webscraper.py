@@ -7,9 +7,9 @@ def sanitize(df):
 
     df = df.drop_duplicates()
     df = df.sort_values("time_in_market", ascending=False)
-    df = df.loc[df["time_in_market"].str.contains('/05/2019', regex=False)]
+    df = df.loc[df["time_in_market"].str.contains("/05/2019", regex=False)]
 
-    df["bedrooms"] = pd.to_numeric(df["bedrooms"], errors='coerce').astype(np.int64)
+    df["bedrooms"] = pd.to_numeric(df["bedrooms"], errors="coerce").astype(np.int64)
 
     return df
 
@@ -24,14 +24,11 @@ def rank(df):
     print("ranking...")
     print(df.columns)
 
-    # ['price', 'type', 'address', 'url', 'agent_url', 'time_in_market',
-    #  'postcode', 'bedrooms', 'search_date']
-    # print(df["type"].unique())
-
     pd.options.display.max_colwidth = 200
 
     df = sanitize(df)
 
     new_df = df.sort_values(["bedrooms", "time_in_market"], ascending=False)
-    print(new_df[["bedrooms", "price", "time_in_market", "url"]])
-    new_df.to_csv(r'output\export_dataframe.csv', index=None, header=True)
+    print(new_df.describe)
+
+    new_df.to_csv(r"output\export_dataframe.csv", index=None, header=True)
