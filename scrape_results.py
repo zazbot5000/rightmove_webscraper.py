@@ -1,4 +1,4 @@
-from modules import io, analysis
+from modules import io, analysis, drive_upload
 
 
 def get_parser():
@@ -9,10 +9,19 @@ def get_parser():
         description=__doc__, formatter_class=ArgumentDefaultsHelpFormatter
     )
     parser.add_argument(
-        "-d",
-        "--download_new",
+        "-s",
+        "--scrape",
         action="store_true",
-        help="load data from local files if they exist",
+        help="scrape data from the rightmove website",
+    )
+    parser.add_argument(
+        "-a",
+        "--analyse",
+        action="store_true",
+        help="load data from local files and analyse",
+    )
+    parser.add_argument(
+        "-u", "--upload", action="store_true", help="upload data to google drive"
     )
 
     return parser
@@ -20,15 +29,17 @@ def get_parser():
 
 def main(args):
 
-    if args.download_new:
+    if args.scrape:
         io.get_and_save()
-    else:
+    elif args.analyse:
         df = io.load()
-
         analysis.rank(df)
+    elif args.upload:
+        service = drive_upload.g_authenticate()
+        drive_upload.save_to_g_drive(service)
 
 
 if __name__ == "__main__":
-    args = get_parser().parse_args()
+    args_main = get_parser().parse_args()
 
-    main(args)
+    main(args_main)
