@@ -3,7 +3,7 @@ import pandas as pd
 
 
 def get_and_save():
-    print("downlaoding data...")
+    print("downloading data...")
     url = "https://www.rightmove.co.uk/property-for-sale/find.html?searchType=SALE&locationIdentifier=STATION%5E1388&insId=1&radius=2.0&minPrice=170000&maxPrice=230000&minBedrooms=2&maxBedrooms=&displayPropertyType=&maxDaysSinceAdded=&_includeSSTC=on&sortByPriceDescending=&primaryDisplayPropertyType=&secondaryDisplayPropertyType=&oldDisplayPropertyType=&oldPrimaryDisplayPropertyType=&newHome=&auction=false"
     rightmove_object = rightmove_data(url)
     df = rightmove_object.get_results
@@ -15,6 +15,7 @@ def get_and_save():
 
     df.search_date = pd.to_datetime(df.search_date)
     df.to_parquet('data/bris_df.parquet', compression=None)
+    print("\nweb data scraped!")
 
 
 def load():

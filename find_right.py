@@ -17,10 +17,10 @@ def main(args):
 
     if args.download_new:
         io.get_and_save()
+    else:
+        df = io.load()
 
-    df = io.load()
-
-    analysis.rank(df)
+        analysis.rank(df)
 
 
 if __name__ == "__main__":

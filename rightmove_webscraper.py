@@ -84,7 +84,7 @@ class _GetDataFromURL(object):
         elif self.rent_or_sale == "sale":
             xp_prices = """//div[@class="propertyCard-priceValue"]/text()"""
 
-        # Set xpaths for listing title, property address, URL, and agent URL:
+         # Set xpaths for listing title, property address, URL, and agent URL:
         xp_titles = """//div[@class="propertyCard-details"]\
         //a[@class="propertyCard-link"]\
         //h2[@class="propertyCard-title"]/text()"""
@@ -96,13 +96,16 @@ class _GetDataFromURL(object):
         //div[@class="propertyCard-branchLogo"]\
         //a[@class="propertyCard-branchLogo-link"]/@href"""
         xp_time_on_market = """//span[@class="propertyCard-contactsAddedOrReduced"]/text()"""
+        xp_distance = """//div[@class="propertyCard-distance"]/span[1]/text()"""
 
 
         # Create data lists from xpaths:
         price_pcm = tree.xpath(xp_prices)
         titles = tree.xpath(xp_titles)
         addresses = tree.xpath(xp_addresses)
+        distance = tree.xpath(xp_distance)
         time_in_market = tree.xpath(xp_time_on_market)
+
         base = "http://www.rightmove.co.uk"
         weblinks = ["{}{}".format(base, tree.xpath(xp_weblinks)[w]) \
                     for w in range(len(tree.xpath(xp_weblinks)))]
@@ -110,10 +113,10 @@ class _GetDataFromURL(object):
                       for a in range(len(tree.xpath(xp_agent_urls)))]
 
         # Store the data in a Pandas DataFrame:
-        data = [price_pcm, titles, addresses, weblinks, agent_urls,time_in_market]
+        data = [price_pcm, titles, addresses, distance, weblinks, agent_urls, time_in_market]
         temp_df = pd.DataFrame(data)
         temp_df = temp_df.transpose()
-        temp_df.columns = ["price", "type", "address", "url", "agent_url","time_in_market"]
+        temp_df.columns = ["price", "type", "address", "distance", "url", "agent_url", "time_in_market"]
 
         # Drop empty rows which come from placeholders in the html:
         temp_df = temp_df[temp_df["address"].notnull()]
