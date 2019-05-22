@@ -100,23 +100,23 @@ class _GetDataFromURL(object):
 
 
         # Create data lists from xpaths:
-        price_pcm = tree.xpath(xp_prices)
-        titles = tree.xpath(xp_titles)
+        prices = tree.xpath(xp_prices)
+        types_full = tree.xpath(xp_titles)
         addresses = tree.xpath(xp_addresses)
         distance = tree.xpath(xp_distance)
         time_in_market = tree.xpath(xp_time_on_market)
 
         base = "http://www.rightmove.co.uk"
-        weblinks = ["{}{}".format(base, tree.xpath(xp_weblinks)[w]) \
+        urls = ["{}{}".format(base, tree.xpath(xp_weblinks)[w]) \
                     for w in range(len(tree.xpath(xp_weblinks)))]
         agent_urls = ["{}{}".format(base, tree.xpath(xp_agent_urls)[a]) \
                       for a in range(len(tree.xpath(xp_agent_urls)))]
 
         # Store the data in a Pandas DataFrame:
-        data = [price_pcm, titles, addresses, distance, weblinks, agent_urls, time_in_market]
+        data = [urls, prices, types_full, distance, time_in_market, addresses, agent_urls]
         temp_df = pd.DataFrame(data)
         temp_df = temp_df.transpose()
-        temp_df.columns = ["price", "type", "address", "distance", "url", "agent_url", "time_in_market"]
+        temp_df.columns = ["url", "price", "type_full", "distance", "time_in_market", "address", "agent_url"]
 
         # Drop empty rows which come from placeholders in the html:
         temp_df = temp_df[temp_df["address"].notnull()]
@@ -156,20 +156,29 @@ class _GetDataFromURL(object):
         results["price"].replace(regex=True, inplace=True, to_replace=r"\D", value=r"")
         results["price"] = pd.to_numeric(results["price"])
 
-        # Extract postcodes to a separate column:
+        # Extract postal outcodes to a separate column:
         pat = r"\b([A-Za-z][A-Za-z]?[0-9][0-9]?[A-Za-z]?)\b"
-        results["postcode"] = results["address"].str.extract(pat, expand=True)
+        results.insert(5, "outcode", results["address"].str.extract(pat, expand=True))
 
-        # Extract number of bedrooms from "type" to a separate column:
-        pat = r"\b([\d][\d]?)\b"
-        results["number_bedrooms"] = results.type.str.extract(pat, expand=True)
-        results.loc[results["type"].str.contains("studio", case=False), "number_bedrooms"] = 0
-
-        # Clean up annoying white spaces and newlines in "type" column:
+        # Clean up annoying white spaces and newlines in "type_full" column:
         for row in range(len(results)):
-            type_str = results.loc[row, "type"]
+            type_str = results.loc[row, "type_full"]
             clean_str = type_str.strip("\n").strip()
-            results.loc[row, "type"] = clean_str
+            results.loc[row, "type_full"] = clean_str
+
+        # Extract number of bedrooms from "type_full" to a separate column:
+        pat = r"\b([\d][\d]?)\b"
+        results.insert(4, "bedrooms", results["type_full"].str.extract(pat, expand=True))
+        results.loc[results["type_full"].str.contains("studio", case=False), "bedrooms"] = 0
+
+        # Extract short type from "type_full" to a separate column
+        results.insert(5, "type", results["type_full"].str.split().str[2:-2].str.join(" "))
+
+        # Delete the now redundant "type_full" column
+        results = results.drop(columns="type_full")
+
+        # Filter out retirement properties
+        results = results.loc[results["type"] != "retirement property"]
 
         # Add column with datetime when the search was run (i.e. now):
         now = dt.datetime.today()
@@ -215,18 +224,18 @@ class rightmove_data(object):
         total = self.get_results["price"].dropna().sum()
         return int(total / self.results_count)
 
-    def summary(self, by="number_bedrooms"):
+    def summary(self, by="bedrooms"):
         """Pandas DataFrame summarising the the results by mean price and count.
-        By default grouped by the `number_bedrooms` column but will accept any
+        By default grouped by the `bedrooms` column but will accept any
         column name from `get_results` as a grouper."""
         df = self.get_results.dropna(axis=0, subset=["price"])
         groupers = {"price":["count", "mean"]}
         df = df.groupby(df[by]).agg(groupers).astype(int)
         df.columns = df.columns.get_level_values(1)
         df.reset_index(inplace=True)
-        if "number_bedrooms" in df.columns:
-            df["number_bedrooms"] = df["number_bedrooms"].astype(int)
-            df.sort_values(by=["number_bedrooms"], inplace=True)
+        if "bedrooms" in df.columns:
+            df["bedrooms"] = df["bedrooms"].astype(int)
+            df.sort_values(by=["bedrooms"], inplace=True)
         else:
             df.sort_values(by=["count"], inplace=True, ascending=False)
         return df.reset_index(drop=True)
