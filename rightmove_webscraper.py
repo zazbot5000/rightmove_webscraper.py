@@ -6,6 +6,7 @@ import requests
 import pandas as pd
 import datetime as dt
 
+
 class _GetDataFromURL(object):
     """This "private" class does all the heavy lifting of fetching data from the
     URL provided, and then returns data to the main `rightmove_data` class
@@ -37,9 +38,8 @@ class _GetDataFromURL(object):
     def rent_or_sale(self):
         """Tag to determine if the search is for properties for rent or sale.
         Required beacuse the Xpaths are different for the target elements."""
-        if "/property-for-sale/" in self.url \
-        or "/new-homes-for-sale/" in self.url:
-             return "sale"
+        if "/property-for-sale/" in self.url or "/new-homes-for-sale/" in self.url:
+            return "sale"
         elif "/property-to-rent/" in self.url:
             return "rent"
         else:
@@ -60,9 +60,11 @@ class _GetDataFromURL(object):
         are 24 results per page. Note that the website limits results to a
         maximum of 42 accessible pages."""
         page_count = self.results_count // 24
-        if self.results_count % 24 > 0: page_count += 1
+        if self.results_count % 24 > 0:
+            page_count += 1
         # Rightmove will return a maximum of 42 results pages, hence:
-        if page_count > 42: page_count = 42
+        if page_count > 42:
+            page_count = 42
         return page_count
 
     @staticmethod
@@ -84,20 +86,21 @@ class _GetDataFromURL(object):
         elif self.rent_or_sale == "sale":
             xp_prices = """//div[@class="propertyCard-priceValue"]/text()"""
 
-         # Set xpaths for listing title, property address, URL, and agent URL:
+        # Set xpaths for listing title, property address, URL, and agent URL:
         xp_titles = """//div[@class="propertyCard-details"]\
         //a[@class="propertyCard-link"]\
         //h2[@class="propertyCard-title"]/text()"""
         xp_addresses = """//address[@class="propertyCard-address"]//span/text()"""
         xp_weblinks = """//div[@class="propertyCard-details"]\
         //a[@class="propertyCard-link"]/@href"""
-        
+
         xp_agent_urls = """//div[@class="propertyCard-contactsItem"]\
         //div[@class="propertyCard-branchLogo"]\
         //a[@class="propertyCard-branchLogo-link"]/@href"""
-        xp_time_on_market = """//span[@class="propertyCard-contactsAddedOrReduced"]/text()"""
+        xp_time_on_market = (
+            """//span[@class="propertyCard-contactsAddedOrReduced"]/text()"""
+        )
         xp_distance = """//div[@class="propertyCard-distance"]/span[1]/text()"""
-
 
         # Create data lists from xpaths:
         prices = tree.xpath(xp_prices)
@@ -107,16 +110,36 @@ class _GetDataFromURL(object):
         time_in_market = tree.xpath(xp_time_on_market)
 
         base = "http://www.rightmove.co.uk"
-        urls = ["{}{}".format(base, tree.xpath(xp_weblinks)[w]) \
-                    for w in range(len(tree.xpath(xp_weblinks)))]
-        agent_urls = ["{}{}".format(base, tree.xpath(xp_agent_urls)[a]) \
-                      for a in range(len(tree.xpath(xp_agent_urls)))]
+        urls = [
+            "{}{}".format(base, tree.xpath(xp_weblinks)[w])
+            for w in range(len(tree.xpath(xp_weblinks)))
+        ]
+        agent_urls = [
+            "{}{}".format(base, tree.xpath(xp_agent_urls)[a])
+            for a in range(len(tree.xpath(xp_agent_urls)))
+        ]
 
         # Store the data in a Pandas DataFrame:
-        data = [urls, prices, types_full, distance, time_in_market, addresses, agent_urls]
+        data = [
+            urls,
+            prices,
+            types_full,
+            distance,
+            time_in_market,
+            addresses,
+            agent_urls,
+        ]
         temp_df = pd.DataFrame(data)
         temp_df = temp_df.transpose()
-        temp_df.columns = ["url", "price", "type_full", "distance", "time_in_market", "address", "agent_url"]
+        temp_df.columns = [
+            "url",
+            "price",
+            "type_full",
+            "distance",
+            "time_in_market",
+            "address",
+            "agent_url",
+        ]
 
         # Drop empty rows which come from placeholders in the html:
         temp_df = temp_df[temp_df["address"].notnull()]
@@ -140,7 +163,8 @@ class _GetDataFromURL(object):
                 rc = self.make_request(p_url)
 
                 # Requests to scrape lots of pages eventually get status 400, so:
-                if rc[1] != 200: break
+                if rc[1] != 200:
+                    break
 
                 # Create a temporary dataframe of page results:
                 temp_df = self.get_page(rc[0])
@@ -168,11 +192,17 @@ class _GetDataFromURL(object):
 
         # Extract number of bedrooms from "type_full" to a separate column:
         pat = r"\b([\d][\d]?)\b"
-        results.insert(4, "bedrooms", results["type_full"].str.extract(pat, expand=True))
-        results.loc[results["type_full"].str.contains("studio", case=False), "bedrooms"] = 0
+        results.insert(
+            4, "bedrooms", results["type_full"].str.extract(pat, expand=True)
+        )
+        results.loc[
+            results["type_full"].str.contains("studio", case=False), "bedrooms"
+        ] = 0
 
         # Extract short type from "type_full" to a separate column
-        results.insert(5, "type", results["type_full"].str.split().str[2:-2].str.join(" "))
+        results.insert(
+            5, "type", results["type_full"].str.split().str[2:-2].str.join(" ")
+        )
 
         # Delete the now redundant "type_full" column
         results = results.drop(columns="type_full")
@@ -186,6 +216,7 @@ class _GetDataFromURL(object):
 
         return results
 
+
 class rightmove_data(object):
     """The `rightmove_data` web scraper collects structured data on properties
     returned by a search performed on www.rightmove.co.uk
@@ -194,6 +225,7 @@ class rightmove_data(object):
     easily access data from the search results, the most useful being
     `get_results`, which returns all results as a Pandas DataFrame object.
     """
+
     def __init__(self, url):
         """Initialize the scraper with a URL from the results of a property
         search performed on www.rightmove.co.uk"""
@@ -229,7 +261,7 @@ class rightmove_data(object):
         By default grouped by the `bedrooms` column but will accept any
         column name from `get_results` as a grouper."""
         df = self.get_results.dropna(axis=0, subset=["price"])
-        groupers = {"price":["count", "mean"]}
+        groupers = {"price": ["count", "mean"]}
         df = df.groupby(df[by]).agg(groupers).astype(int)
         df.columns = df.columns.get_level_values(1)
         df.reset_index(inplace=True)
