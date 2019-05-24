@@ -1,4 +1,4 @@
-from modules import scraper, analyser, gdrive_tools
+from modules import scraper, analyser, gdrive_io
 
 
 def get_parser():
@@ -40,7 +40,7 @@ def main(args):
         analyser.analyse(df)
 
     if args.upload or args.complete:
-        gdrive_tools.upload_csv()
+        gdrive_io.upload_csv()
 
 
 if __name__ == "__main__":
