@@ -19,14 +19,14 @@ def g_authenticate():
 
 
 def save_to_g_drive(service):
+    print("uploading to Google Sheets...")
     # Get the fileID from the drive sheet url
     fileId = "1dYUGY54QYEnAfcd2JN_TUY1Sba3TRFAGvDQFM-WteKA"
     _media = MediaFileUpload(
         Path("output/export_dataframe.csv"), mimetype="text/csv", resumable=True
     )
     _updatedFile = service.files().update(fileId=fileId, media_body=_media).execute()
-
-    print("\nCSV data uploaded!")
+    print("\tCSV data uploaded!")
 
 
 def main():

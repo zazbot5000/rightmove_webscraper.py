@@ -20,15 +20,15 @@ def grouped_print(df):
     print(grouped_df.aggregate(np.mean))
 
 
-def rank(df):
-    print("ranking...")
-    print(df.columns)
-
+def analyse(df):
+    print("analysing data...")
     pd.options.display.max_colwidth = 200
-
     df = sanitize(df)
 
+    print("\tsorting...")
     new_df = df.sort_values(["bedrooms", "time_in_market"], ascending=False)
-    print(new_df.describe)
 
+    print("\texporting to csv...")
     new_df.to_csv(r"output\export_dataframe.csv", index=None, header=True)
+
+    print("\tanalysis complete!")

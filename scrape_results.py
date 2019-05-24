@@ -23,18 +23,23 @@ def get_parser():
     parser.add_argument(
         "-u", "--upload", action="store_true", help="upload data to google drive"
     )
+    parser.add_argument(
+        "-c", "--complete", action="store_true", help="run the complete workflow"
+    )
 
     return parser
 
 
 def main(args):
 
-    if args.scrape:
+    if args.scrape or args.complete:
         io.get_and_save()
-    elif args.analyse:
+
+    if args.analyse or args.complete:
         df = io.load()
-        analysis.rank(df)
-    elif args.upload:
+        analysis.analyse(df)
+
+    if args.upload or args.complete:
         service = drive_upload.g_authenticate()
         drive_upload.save_to_g_drive(service)
 

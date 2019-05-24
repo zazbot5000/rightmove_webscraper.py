@@ -155,8 +155,8 @@ class _GetDataFromURL(object):
 
         # Extract number of bedrooms from "type" to a separate column:
         pat = r"\b([\d][\d]?)\b"
-        results["number_bedrooms"] = results.type.str.extract(pat, expand=True)
-        results.loc[results["type"].str.contains("studio", case=False), "number_bedrooms"] = 0
+        results["bedrooms"] = results.type.str.extract(pat, expand=True)
+        results.loc[results["type"].str.contains("studio", case=False), "bedrooms"] = 0
 
         # Clean up annoying white spaces and newlines in "type" column:
         for row in range(len(results)):
@@ -208,18 +208,18 @@ class rightmove_data(object):
         total = self.get_results["price"].dropna().sum()
         return int(total / self.results_count)
 
-    def summary(self, by="number_bedrooms"):
+    def summary(self, by="bedrooms"):
         """Pandas DataFrame summarising the the results by mean price and count.
-        By default grouped by the `number_bedrooms` column but will accept any
+        By default grouped by the `bedrooms` column but will accept any
         column name from `get_results` as a grouper."""
         df = self.get_results.dropna(axis=0, subset=["price"])
         groupers = {"price":["count", "mean"]}
         df = df.groupby(df[by]).agg(groupers).astype(int)
         df.columns = df.columns.get_level_values(1)
         df.reset_index(inplace=True)
-        if "number_bedrooms" in df.columns:
-            df["number_bedrooms"] = df["number_bedrooms"].astype(int)
-            df.sort_values(by=["number_bedrooms"], inplace=True)
+        if "bedrooms" in df.columns:
+            df["bedrooms"] = df["bedrooms"].astype(int)
+            df.sort_values(by=["bedrooms"], inplace=True)
         else:
             df.sort_values(by=["count"], inplace=True, ascending=False)
         return df.reset_index(drop=True)
