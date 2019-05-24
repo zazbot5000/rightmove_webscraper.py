@@ -1,4 +1,4 @@
-from modules import io, analysis, drive_upload
+from modules import io, analysis, gdrive_tools
 
 
 def get_parser():
@@ -40,8 +40,7 @@ def main(args):
         analysis.analyse(df)
 
     if args.upload or args.complete:
-        service = drive_upload.g_authenticate()
-        drive_upload.save_to_g_drive(service)
+        gdrive_tools.upload_csv()
 
 
 if __name__ == "__main__":

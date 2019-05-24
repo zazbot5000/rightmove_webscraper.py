@@ -29,11 +29,7 @@ def save_to_g_drive(service):
     print("\tCSV data uploaded!")
 
 
-def main():
+def upload_csv():
     _service = g_authenticate()
     save_to_g_drive(_service)
     return
-
-
-if __name__ == "__main__":
-    main()
