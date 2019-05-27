@@ -18,18 +18,22 @@ def g_authenticate():
     return service
 
 
-def save_to_g_drive(service):
+def upload_csv(area_type):
+    """ Get the fileID from the drive sheet url """
     print("uploading to Google Sheets...")
-    # Get the fileID from the drive sheet url
-    fileId = "1dYUGY54QYEnAfcd2JN_TUY1Sba3TRFAGvDQFM-WteKA"
+
+    service = g_authenticate()
+
+    if area_type == "radius":
+        fileId = "1dYUGY54QYEnAfcd2JN_TUY1Sba3TRFAGvDQFM-WteKA"
+    else:
+        # polylines area
+        fileId = "1_95DWzlo5WF2vDSBSYKFEI08aGofGVnhwfIIXqVCBvc"
+
     _media = MediaFileUpload(
         Path("output/export_dataframe.csv"), mimetype="text/csv", resumable=True
     )
     _updatedFile = service.files().update(fileId=fileId, media_body=_media).execute()
     print("\tCSV data uploaded!")
 
-
-def upload_csv():
-    _service = g_authenticate()
-    save_to_g_drive(_service)
     return

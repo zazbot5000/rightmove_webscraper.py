@@ -32,15 +32,16 @@ def get_parser():
 
 def main(args):
 
-    if args.scrape or args.complete:
-        scraper.get_and_save()
+    for area_type in ["radius", "poly"]:
+        if args.scrape or args.complete:
+            scraper.get_and_save(area_type)
 
-    if args.analyse or args.complete:
-        df = scraper.load()
-        analyser.analyse(df)
+        if args.analyse or args.complete:
+            df = scraper.load()
+            analyser.analyse(df)
 
-    if args.upload or args.complete:
-        gdrive_io.upload_csv()
+        if args.upload or args.complete:
+            gdrive_io.upload_csv(area_type)
 
 
 if __name__ == "__main__":
