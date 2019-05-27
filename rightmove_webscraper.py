@@ -177,7 +177,7 @@ class _GetDataFromURL(object):
         results.reset_index(inplace=True, drop=True)
 
         # add the unique ID
-        results.insert(0, "Unique ID", results["url"].str.split("property-").apply(lambda x: x[2]).str.replace(".html", ""))
+        results.insert(0, "unique ID", results["url"].str.split("property-").apply(lambda x: x[2]).str.replace(".html", ""))
 
         # Convert price column to numeric type:
         results["price"].replace(regex=True, inplace=True, to_replace=r"\D", value=r"")
@@ -189,7 +189,7 @@ class _GetDataFromURL(object):
         # Split the most recent acivity date
         results["time_in_market"].str.split(" on ").apply(lambda x: x[0])
         results.insert(5, "activity", results["time_in_market"].str.split(" on ").apply(lambda x: x[0]))
-        results.insert(6, "active date", results["time_in_market"].str.split(" on ").apply(lambda x: x[1]))
+        results.insert(6, "activity date", results["time_in_market"].str.split(" on ").apply(lambda x: x[1]))
         results = results.drop(columns="time_in_market")
 
         # Extract postal outcodes to a separate column:

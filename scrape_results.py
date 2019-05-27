@@ -34,7 +34,7 @@ def main(args):
 
     for area_type in ["radius", "poly"]:
         if args.scrape or args.complete:
-            scraper.get_and_save(area_type)
+            scraper.scan_and_save(area_type)
 
         if args.analyse or args.complete:
             df = scraper.load()
