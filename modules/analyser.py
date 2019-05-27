@@ -6,8 +6,8 @@ def sanitize(df):
     print("\tsanitising...")
 
     df = df.drop_duplicates()
-    df = df.sort_values("time_in_market", ascending=False)
-    df = df.loc[df["time_in_market"].str.contains("/05/2019", regex=False)]
+    df = df.sort_values("active date", ascending=False)
+    df = df.loc[df["active date"].str.contains("/05/2019", regex=False)]
 
     df["bedrooms"] = pd.to_numeric(df["bedrooms"], errors="coerce").astype(np.int64)
 
@@ -26,7 +26,7 @@ def analyse(df):
     df = sanitize(df)
 
     print("\tsorting...")
-    new_df = df.sort_values(["bedrooms", "time_in_market"], ascending=False)
+    new_df = df.sort_values(["bedrooms", "active date"], ascending=False)
 
     print("\texporting to csv...")
     new_df.to_csv(r"output\export_dataframe.csv", index=None, header=True)

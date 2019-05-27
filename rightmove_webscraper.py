@@ -135,7 +135,7 @@ class _GetDataFromURL(object):
             "url",
             "price",
             "type_full",
-            "distance",
+            "distance (miles)",
             "time_in_market",
             "address",
             "agent_url",
@@ -176,13 +176,25 @@ class _GetDataFromURL(object):
         # Reset the index:
         results.reset_index(inplace=True, drop=True)
 
+        # add the unique ID
+        results.insert(0, "Unique ID", results["url"].str.split("property-").apply(lambda x: x[2]).str.replace(".html", ""))
+
         # Convert price column to numeric type:
         results["price"].replace(regex=True, inplace=True, to_replace=r"\D", value=r"")
         results["price"] = pd.to_numeric(results["price"])
 
+        # Format the distance column:
+        results["distance (miles)"] = results["distance (miles)"].astype(str).str.split().str[0]
+
+        # Split the most recent acivity date
+        results["time_in_market"].str.split(" on ").apply(lambda x: x[0])
+        results.insert(5, "activity", results["time_in_market"].str.split(" on ").apply(lambda x: x[0]))
+        results.insert(6, "active date", results["time_in_market"].str.split(" on ").apply(lambda x: x[1]))
+        results = results.drop(columns="time_in_market")
+
         # Extract postal outcodes to a separate column:
         pat = r"\b([A-Za-z][A-Za-z]?[0-9][0-9]?[A-Za-z]?)\b"
-        results.insert(5, "outcode", results["address"].str.extract(pat, expand=True))
+        results.insert(7, "outcode", results["address"].str.extract(pat, expand=True))
 
         # Clean up annoying white spaces and newlines in "type_full" column:
         for row in range(len(results)):
