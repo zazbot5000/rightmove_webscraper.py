@@ -29,6 +29,6 @@ def analyse(df):
     new_df = df.sort_values(["bedrooms", "activity date"], ascending=False)
 
     print("\texporting to csv...")
-    new_df.to_csv(r"output\export_dataframe.csv", index=None, header=True)
+    new_df.to_csv(r"data\export_dataframe.csv", index=None, header=True)
 
     print("\tanalysis complete!")

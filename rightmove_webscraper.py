@@ -186,10 +186,16 @@ class _GetDataFromURL(object):
         # Format the distance column:
         results["distance (miles)"] = results["distance (miles)"].astype(str).str.split().str[0]
 
+        # replace any "today" listings
+        today = dt.datetime.today().strftime("%d/%m/%Y")
+        results["time_in_market"] = results["time_in_market"].str.replace('today', f'on {today}')
+        # print(results["time_in_market"])
+
         # Split the most recent acivity date
-        results["time_in_market"].str.split(" on ").apply(lambda x: x[0])
-        results.insert(5, "activity", results["time_in_market"].str.split(" on ").apply(lambda x: x[0]))
-        results.insert(6, "activity date", results["time_in_market"].str.split(" on ").apply(lambda x: x[1]))
+        results.insert(5, "activity", results["time_in_market"].str.split(" ").apply(lambda x: x[0]))
+        results.insert(6, "activity date", results["time_in_market"].str.split(" ").apply(lambda x: x[-1]))
+
+        # Remove the now redundant "time_in_market" column
         results = results.drop(columns="time_in_market")
 
         # Extract postal outcodes to a separate column:
@@ -220,11 +226,11 @@ class _GetDataFromURL(object):
         results = results.drop(columns="type_full")
 
         # Filter out retirement properties
+        print("\t\tremoving retirement properties: ", results.loc[results["type"] == "retirement property"].shape[0])
         results = results.loc[results["type"] != "retirement property"]
 
-        # Add column with datetime when the search was run (i.e. now):
-        now = dt.datetime.today()
-        results["search_date"] = now
+        # Add column with today's date
+        results["search_date"] = today
 
         return results
 
