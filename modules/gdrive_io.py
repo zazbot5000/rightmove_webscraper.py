@@ -31,7 +31,7 @@ def upload_csv(area_type):
         fileId = "1_95DWzlo5WF2vDSBSYKFEI08aGofGVnhwfIIXqVCBvc"
 
     _media = MediaFileUpload(
-        Path("output/export_dataframe.csv"), mimetype="text/csv", resumable=True
+        Path("data/export_dataframe.csv"), mimetype="text/csv", resumable=True
     )
     _updatedFile = service.files().update(fileId=fileId, media_body=_media).execute()
     print("\tCSV data uploaded!")

@@ -1,3 +1,4 @@
+from pathlib import Path
 import pandas as pd
 import numpy as np
 
@@ -29,6 +30,6 @@ def analyse(df):
     new_df = df.sort_values(["bedrooms", "activity date"], ascending=False)
 
     print("\texporting to csv...")
-    new_df.to_csv(r"data\export_dataframe.csv", index=None, header=True)
+    new_df.to_csv(Path("data/export_dataframe.csv"), index=None, header=True)
 
     print("\tanalysis complete!")
