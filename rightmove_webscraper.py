@@ -4,7 +4,7 @@
 from lxml import html, etree
 import requests
 import pandas as pd
-import datetime as dt
+from datetime import datetime, timedelta
 
 
 class _GetDataFromURL(object):
@@ -187,9 +187,11 @@ class _GetDataFromURL(object):
         results["distance (miles)"] = results["distance (miles)"].astype(str).str.split().str[0]
 
         # replace any "today" listings
-        today = dt.datetime.today().strftime("%d/%m/%Y")
+        today = datetime.today().strftime("%d/%m/%Y")
+        yesterday = (datetime.today() - timedelta(days=1)).strftime("%d/%m/%Y")
         results["time_in_market"] = results["time_in_market"].str.replace('today', f'on {today}')
-        # print(results["time_in_market"])
+        results["time_in_market"] = results["time_in_market"].str.replace('yesterday', f'on {yesterday}')
+        # print(results["time_in_market"].unique())
 
         # Split the most recent acivity date
         results.insert(5, "activity", results["time_in_market"].str.split(" ").apply(lambda x: x[0]))
