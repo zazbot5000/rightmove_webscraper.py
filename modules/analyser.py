@@ -7,8 +7,10 @@ def sanitize(df):
     print("\tsanitising...")
 
     df = df.drop_duplicates()
-    df = df.sort_values("activity date", ascending=False)
-    df = df.loc[df["activity date"].str.contains("/05/2019", regex=False)]
+
+    # df["activity datetime"] = pd.to_datetime(df["activity date"])
+    # df = df.sort_values("activity datetime", ascending=False)
+    df = df.loc[df["activity date"].str.contains('|'.join(["/05/2019", "/06/2019"]))]
 
     df["bedrooms"] = pd.to_numeric(df["bedrooms"], errors="coerce").astype(np.int64)
 
