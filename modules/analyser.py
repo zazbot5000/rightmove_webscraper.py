@@ -6,13 +6,10 @@ import numpy as np
 def sanitize(df):
     print("\tsanitising...")
 
-    df = df.drop_duplicates()
-
-    # df["activity datetime"] = pd.to_datetime(df["activity date"])
-    # df = df.sort_values("activity datetime", ascending=False)
-    df = df.loc[df["activity date"].str.contains('|'.join(["/05/2019", "/06/2019"]))]
-
-    df["bedrooms"] = pd.to_numeric(df["bedrooms"], errors="coerce").astype(np.int64)
+    # df = df.drop_duplicates()
+    df.drop_duplicates(inplace=False)
+    df.loc[:, "bedrooms"] = pd.to_numeric(df["bedrooms"], errors="coerce").astype(np.int64)
+    df.loc[:, "activity datetime"] = pd.to_datetime(df["activity date"], format='%d/%m/%Y')
 
     return df
 
@@ -29,7 +26,7 @@ def analyse(df):
     df = sanitize(df)
 
     print("\tsorting...")
-    new_df = df.sort_values(["bedrooms", "activity date"], ascending=False)
+    new_df = df.sort_values(["bedrooms", "activity datetime"], ascending=False)
 
     print("\texporting to csv...")
     new_df.to_csv(Path("data/export_dataframe.csv"), index=None, header=True)
