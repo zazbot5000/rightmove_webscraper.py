@@ -6,8 +6,7 @@ import numpy as np
 def sanitize(df):
     print("\tsanitising...")
 
-    # df = df.drop_duplicates()
-    df.drop_duplicates(inplace=False)
+    df.drop_duplicates(inplace=True)
     df.loc[:, "bedrooms"] = pd.to_numeric(df["bedrooms"], errors="coerce").astype(np.int64)
     df.loc[:, "activity datetime"] = pd.to_datetime(df["activity date"], format='%d/%m/%Y')
 
@@ -26,9 +25,10 @@ def analyse(df):
     df = sanitize(df)
 
     print("\tsorting...")
-    new_df = df.sort_values(["bedrooms", "activity datetime"], ascending=False)
+    df = df.sort_values(["bedrooms", "activity datetime"], ascending=False)
+    df = df.drop(columns="activity datetime")
 
     print("\texporting to csv...")
-    new_df.to_csv(Path("data/export_dataframe.csv"), index=None, header=True)
+    df.to_csv(Path("data/export_dataframe.csv"), index=None, header=True)
 
     print("\tanalysis complete!")
