@@ -7,7 +7,7 @@ def scan_and_save(area_type):
 
     radius = "2.0"
     minPrice = "160000"
-    maxPrice = "264000"
+    maxPrice = "274000"
     maxDaysSinceAdded = ""
 
     if area_type == "radius":
