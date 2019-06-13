@@ -1,9 +1,11 @@
 from rightmove_webscraper import rightmove_data
 import pandas as pd
+from datetime import datetime
 
 
 def scan_and_save(area_type):
-    print(f"\nscraping RightMove web data for '{area_type}'...")
+    time_now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"\nscraping RightMove web data for '{area_type}' on {time_now}...")
 
     radius = "2.0"
     minPrice = "160000"
