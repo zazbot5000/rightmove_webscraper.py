@@ -182,6 +182,7 @@ class _GetDataFromURL(object):
         # Convert price column to numeric type:
         results["price"].replace(regex=True, inplace=True, to_replace=r"\D", value=r"")
         results["price"] = pd.to_numeric(results["price"])
+        results["price"] = results["price"].round(-3).div(1000)
 
         # Format the distance column:
         results["distance (miles)"] = results["distance (miles)"].astype(str).str.split().str[0]
